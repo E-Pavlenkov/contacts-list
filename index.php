@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Router
+ * Very simple Router
  * 
  */
 class Router
@@ -43,11 +43,15 @@ class Router
 
 
 $routes = new Router();
+
 $routes->set('/', 'MainPage');
 $routes->set('add', 'AddContact');
 $routes->set('list', 'MainPage');
 $routes->set('remove', 'RemoveContact');
-$routes->set('1000', 'getRussianNames');
+
+/** this url for filling base */
+$routes->set('1000', 'FillWithRussianNames');
+
 $routes->run();
 
 
@@ -256,7 +260,7 @@ class RemoveContact extends MainPage
  * Autofill base with 1000 lines
  * 
  */
-class getRussianNames extends Page
+class FillWithRussianNames extends Page
 {
     private $n, $ready, $fmale, $ffemale, $flast;
 

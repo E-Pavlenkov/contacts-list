@@ -1,0 +1,28 @@
+<?php foreach ($this->contacts as $contact): ?>
+<tr>
+    <td><?=$contact->name ?></td>
+    <td><?=$contact->phone ?></td>
+    <td><?=$contact->email ?></td>
+    <td><button data-remove="<?=$contact->id ?>" class="button small alert">&times;</button></td>
+</tr>
+<?php endforeach ?>
+
+<tr>
+    <td colspan="4">
+        <nav class="small-12">
+            <ul class="pagination text-center">
+                <?php foreach ($this->pagination as $block): ?>
+                    <?php foreach ($block as $i): ?>
+                        <?php if ($i == 0): ?>
+                            <li class="ellipsis"></li>
+                        <?php elseif ($i == $this->page): ?>
+                            <li class="current"><?=$i?></li>
+                        <?php else: ?>
+                            <li><a data-ajax="<?=$i?>" href="?page=<?=$i?><?=$this->query?>"><?=$i?></a></li>
+                        <?php endif ?>
+                    <?php endforeach ?>
+                <?php endforeach ?>
+            </ul>
+        </nav>
+    </td>
+</tr>

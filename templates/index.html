@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <title>Контакты</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Контакты" />
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/foundation/6.4.3/css/foundation.min.css">
+
+    <style>
+        td .button {
+            margin-bottom: 0;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="">
+        <div class="text-center">
+          <h1>Список контактов</h1>
+        </div>
+    </div>
+
+    <div class="grid-container">
+        <div class="small-12">
+            <div class="callout secondary">
+                <form action="add" method="POST">
+                    <div class="grid-x grid-margin-x">
+                        <div class="cell small-12 medium-3">
+                            <label>Имя
+                                <input name="name" type="text" placeholder="Иванов Иван" required>
+                            </label>
+                        </div>
+                        <div class="cell small-12 medium-3">
+                            <label>Телефон
+                                <input name="phone" type="text" placeholder="+7 999 888 77 55" required>
+                            </label>
+                        </div>
+                        <div class="cell small-12 medium-3">
+                            <label>E-mail
+                                <input name="email" type="email" placeholder="ivanov@mail.ru" required>
+                            </label>
+                        </div>
+                        <div class="cell small-12 medium-3">
+                            <label>&nbsp;</label>
+                            <button type="submit" class="button">Добавить контакт</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="small-12">
+            <table class="hover">
+                <thead>
+                    <tr>
+                        <th>Имя</th>
+                        <th width="200">Телефон</th>
+                        <th width="200">E-mail</th>
+                        <th width="20">&nbsp;</th>
+                    </tr>
+                    <tr>
+                        <th><input form="filters" data-search name="name" type="text" placeholder="Иванов" autocomplete="off" value="<?=$_GET['name'] ?? ''?>"></th>
+                        <th><input form="filters" data-search name="phone" type="number" placeholder="79998887755" autocomplete="off" value="<?=$_GET['phone'] ?? ''?>"></th>
+                        <th><input form="filters" data-search name="email" type="email" placeholder="ivanov@mail.ru" autocomplete="off" value="<?=$_GET['email'] ?? ''?>"></th>
+                        <th><button class="button reset-search">&times;</button></th>
+                    </tr>
+                </thead>
+                <tbody id="list">
+                    <? include('list.html') ?>
+                </tbody>
+              </table>
+        </div>
+    </div>
+
+    <form id="filters" action="" method="POST">
+        <input name="page" type="hidden" value="<?=$this->page ?>">
+    </form>
+<!-- scripts -->
+<script>
+
+function initAjax() {
+    var ajax = document.querySelectorAll("[data-ajax]");
+
+    ajax.forEach(function(item) {
+        item.onclick = function (event) {
+            event.preventDefault();
+
+            let page = document.querySelector('[name="page"]');
+            page.value = item.dataset.ajax;
+            
+            updateList();
+
+        };
+    });
+
+    var searches = document.querySelectorAll("[data-search]");
+    searches.forEach(function(item) {
+        item.oninput = function (event) {
+            event.preventDefault();
+
+            let page = document.querySelector('[name="page"]');
+            if (page) page.value = 1;
+
+            updateList();
+        };
+    });
+
+    var reset = document.querySelector(".reset-search"); 
+    if (reset) {
+        reset.onclick = function (event) {
+            event.preventDefault();
+
+            let page = document.querySelector('[name="page"]');
+            if (page) page.value = 1;
+
+            let form = document.getElementById('filters');
+            if (form) form.reset();
+            
+            updateList();
+        };
+    }
+
+    var removes = document.querySelectorAll("[data-remove]");
+
+    removes.forEach(function(item) {
+        item.onclick = function (event) {
+            event.preventDefault();
+
+            if (confirm('Удалить?')) {
+                let form = document.getElementById('filters');
+                let page = form.querySelector('[name="page"]') ? form.querySelector('[name="page"]').value : '1';
+                
+                let data = new FormData();
+                data.append('id', item.dataset.remove);
+                data.append('page', page);
+
+                fetch('remove', {method: 'POST', body: data})
+                .then((response) => {
+                    return response.text();
+                })
+                .then((html) => {
+                    document.getElementById('list').innerHTML = html;
+                    initAjax();
+                });
+            }
+        };
+    });
+}
+
+
+function updateList() {
+    let form = document.getElementById('filters');
+    let data = new FormData(form); 
+
+    fetch(form.action, {method: 'POST', body: data})
+    .then((response) => {
+        return response.text();
+    })
+    .then((html) => {
+        document.getElementById('list').innerHTML = html;
+        initAjax();
+    });
+}
+
+
+document.addEventListener("DOMContentLoaded", function () {
+    initAjax();
+});
+</script>
+
+</body>
+</html>
